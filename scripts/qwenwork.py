@@ -1,4 +1,7 @@
-"""Local QwenWork connector. No model API, recruiter automation, or shared account."""
+"""Shared local OfferPath service; the original QwenWork CLI stays compatible.
+
+The Codex entry point is codex_bridge.py. No model API or recruiter automation.
+"""
 import argparse
 import copy
 import datetime as dt
@@ -360,6 +363,7 @@ class QwenService:
         identity = found[0]['id'] if found else job['id']
         old_record = state['records'].get(package['package_id'])
         check(not old_record or old_record.get('connection_id') == self.config.get('connection_id', 'synthetic'), '已有留档属于其他连接，不能沿用或覆盖')
+        # Keep the historical marker format so upgrades recognize existing notes.
         marker = 'OfferPath QwenWork package=' + package['package_id']
         if found:
             current = found[0]
@@ -367,7 +371,7 @@ class QwenService:
             check(old_record or current.get('stage') == '想投' or marker in current.get('notes', ''), '已有申请记录，禁止另行覆盖或重复登记')
         else:
             current = dict(id=identity, company=job['company'], role=job['role'], location=job['location'], company_type='待确认', stage='想投', stage_at=stamp(),
-                           source='QwenWork 用户申报', url=job['url'], notes='', next_action='等待反馈', activities_json='[]', favorite=False, updated_at=stamp())
+                           source='OfferPath Agent 用户申报', url=job['url'], notes='', next_action='等待反馈', activities_json='[]', favorite=False, updated_at=stamp())
             self.remote.request('/api/applications/' + identity, 'PUT', encoded(current), {'content-type': 'application/json'})
         current = next(r for r in self.remote.rows() if r['id'] == identity)
         path = '/api/applications/' + identity

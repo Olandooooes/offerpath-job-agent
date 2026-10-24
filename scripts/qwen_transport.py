@@ -310,8 +310,10 @@ def make_handler(service, base_url):
                 return self._rpc_result(request_id, {
                     "protocolVersion": negotiated, "capabilities": capabilities,
                     "serverInfo": {"name": "offerpath-job-agent", "version": "0.1.0"},
-                    "instructions": "Local synthetic connector. Human PDF confirmation is required; "
-                                    "tool access never authorizes an application submission.",
+                    "instructions": "OfferPath local connector; synthetic data is the default. "
+                                    "Human PDF confirmation is required in the local review card. "
+                                    "Never read its human review code or approve on the user's behalf. "
+                                    "Tool access never authorizes an application submission.",
                 })
             if method == "ping":
                 return self._rpc_result(request_id, {})

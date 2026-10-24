@@ -8,6 +8,7 @@ secrets.json
 profile.json
 jobs.json
 *qwenwork-connection*.json
+*codex-connection*.toml
 *.sqlite*
 *.db
 runtime/

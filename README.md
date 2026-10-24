@@ -17,24 +17,27 @@
 
 </div>
 
-## 🆕 千问办公连接器预览
+## 🆕 先在 Codex 中使用
 
-把本项目作为千问办公技能安装，并连接本机OfferPath MCP桥后，可以直接在对话里整理用户提供的简历与完整JD、保存定制草稿、获取实际PDF、报告申请结果和同步记录。首次资料和每版PDF都由本人在本地页确认，默认先用合成资料体验。**无需购买模型API，模型推理由你使用的AI客户端提供；客户端额度和权益由对应平台决定。合成资料只是虚构输入，不代表在真实千问客户端中一定不使用模型。**
+当前优先完善 **Codex + GitHub Skill + 本地 OfferPath 连接器**。你在 Codex 对话里提供简历和完整JD，Agent逐岗定制并生成实际PDF；本人审阅后，再按真实申请结果同步记录与附件。无需在网页和AI之间来回复制结果JSON。
 
-本版本先提供本地合成验证路径，保留原有Codex流程。它没有部署公共MCP服务、修改OfferPath线上网站或开放自动投递。
+**无需另购模型API。**内容定制使用你现有的Codex模型权益，额度和使用条件由平台决定，不承诺无限免费。连接器只在本机运行，没有部署公共服务或修改OfferPath线上网站。
 
 | 能力 | 当前边界 |
 | --- | --- |
-| 免费开源技能与本地桥 | 仓库提供代码；运行环境仍需Python及PDF依赖 |
-| 千问办公技能安装与MCP配置 | 按官方格式适配；在用户自己的客户端中仍需实机验收 |
-| 简历资料与岗位录入 | AI提取并提出事实，本人在本地页确认；岗位保存完整JD。本机私有缓存不是云端事实库 |
-| 逐岗草稿、事实引用、实际PDF | 由客户端AI生成草稿，本地桥核验结构和版本并生成文件；引用不能自动证明语义真实 |
-| PDF确认 | 本人打开本地审阅页确认；AI没有确认工具，不能代点 |
-| 合成记录同步 | 只写仓库外的本地模拟台账，保留PDF原件；不写线上账户 |
-| 正式OfferPath账号连接 | 需要本人可用的独立授权；安装技能不等于完成授权或公共OAuth已上线 |
-| 原有Codex检查和同步 | 继续保留，沿用原来的私有配置、检查与钥匙串认证 |
+| Codex技能与本地MCP连接 | 技能安装与工具连接分两步；需要Python、PDF依赖和一次本地配置 |
+| 简历资料与岗位录入 | Codex提出事实供本人确认，保存完整JD；私有资料放在仓库外 |
+| 逐岗草稿与实际PDF | Codex生成内容，连接器核验事实引用、版本并生成文件；引用不能自动证明语义真实 |
+| PDF确认 | 本人打开本地审阅卡查看具体PDF并确认，AI不得代点 |
+| 合成记录同步 | 只写本机模拟台账，保留实际PDF；不写正式账户 |
+| 正式OfferPath连接 | 需本人独立授权；正式账户与云端预览仍需分别验收 |
+| 原有Codex执行器 | `agent.py`、`setup.py`、离线演示、私有配置及钥匙串认证全部保留 |
 
-[千问办公本地连接指南 →](references/qwenwork.md)
+[Codex安装与连接指南 →](references/codex.md)
+
+已通过98项本地合成测试，并实测本机Codex app-server的工具发现、草稿保存与实际PDF读取。桌面GUI新用户安装及正式账户联调仍需独立验收，详见[Codex合成验收记录](docs/codex-acceptance.md)。
+
+千问办公等其他客户端**暂缓适配**。已有[千问参考文档](references/qwenwork.md)与代码保留，当前不作为推荐使用入口；先把Codex流程实际跑通，再扩展其他客户端。
 
 ## 🌱 为什么做这个项目
 
@@ -105,55 +108,50 @@ flowchart LR
 
 ## 🚀 开始使用
 
-### 千问办公：先体验本地合成流程
+### 推荐：Codex对话连接器
 
-先在千问办公桌面端说：
+先让Codex按[连接指南](references/codex.md)安装GitHub技能、建立仓库外合成工作区，并生成本机MCP配置片段。由本人将片段合并到Codex设置或配置，重新载入后开启新任务。**安装技能不等于MCP已连接。**
 
-```text
-请将 https://github.com/Olandooooes/offerpath-job-agent 下载到
-~/.qwenworkcn/skills/offerpath-job-agent，保留已有同名技能与本地修改。
-阅读 references/qwenwork.md，帮我建立仓库外的全新合成工作区，
-启动本地连接器并配置到千问办公。先不连接真实账号、不投递。
-```
-
-首次安装需要本机Python和PDF依赖；启动和连接步骤见[完整指南](references/qwenwork.md)。确认本机桥已启动后，在千问办公「扩展 → 连接器 → 添加 → 粘贴JSON配置」中导入生成的私有配置，再新建一个对话任务。
-
-日常可说：
+工具可用后，在Codex中说：
 
 ```text
-使用 offerpath-job-agent，选一个合成岗位，读取已确认经历，
-逐岗定制简历并给我实际PDF。等我本人审阅确认后，再继续记录流程。
+$offerpath-job-agent
+先选一个合成岗位，读取已确认经历，按完整JD逐岗定制简历。
+给我实际PDF和本地审阅链接，等我本人确认后再继续。
+只做合成体验，不连接真实账号、不真实投递。
 ```
 
-你可把自己的简历和岗位JD交给客户端AI，它通过工具保存资料建议和岗位；资料先由本人在本地页确认，再定制。资料保存在仓库外本机私有工作区，不声称云端事实库已上线。你无需在AI与网页之间复制返回JSON。PDF确认仍需本人打开本地审阅页；不要让AI代点确认。安装技能并不自动启动服务，当前也没有“所有用户一键授权连接线上OfferPath”的公共服务。
+Codex启动MCP进程时会自动启动本机PDF审阅服务，不必另开服务终端。PDF确认仍由本人在本地审阅卡完成，AI不能代点。你可在确认后让Codex模拟报告申请结果并同步本地合成记录；合成结果不能冒充真实回执。
 
-### Codex：原有安装方式
+### 保留：原有Codex申请包工作流
+
+已有私有配置可继续使用以下流程，不必迁移。连接器的合成记录不授予原有检查器投递许可，也不解除历史未知结果锁。
 
 ### 1. 先试运行测试
 
-原有`agent.py`只使用Python标准库；千问桥生成和核验PDF需要额外依赖。先安装桥依赖，再运行全部测试：
+原有`agent.py`只使用Python标准库；对话连接器生成和核验PDF需要额外依赖。建议先建立虚拟环境，再安装连接器依赖并运行全部测试：
 
 ```sh
 git clone https://github.com/Olandooooes/offerpath-job-agent.git
 cd offerpath-job-agent
-python3 -m pip install -r requirements-qwenwork.txt
+python3 -m pip install -r requirements-connector.txt
 PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -v
 ```
 
 测试使用临时文件、合成材料、假账户和本机临时HTTP服务。不需要真实账户或令牌，不会发送申请或写入生产记录。环境若禁止本机端口监听，HTTP集成测试需要在允许环回网络的环境运行。
 
-完整测试还需要中文TrueType字体；Linux CI安装`fonts-wqy-zenhei`和`poppler-utils`，其他环境见[字体与启动说明](references/qwenwork.md)。本地86项合成测试、实际PDF渲染与独立技能前向验收已通过，范围与限制见[千问适配验收](docs/qwenwork-acceptance.md)。
+完整测试还需要中文TrueType字体；Linux CI安装`fonts-wqy-zenhei`和`poppler-utils`，其他环境见[Codex字体与启动说明](references/codex.md)。既有HTTP连接器的合成验收范围见[历史验收记录](docs/qwenwork-acceptance.md)；这些结果不代表已完成Codex客户端或正式账户验收。
 
 ### 2. 作为Codex技能安装
 
-将本仓库放在你的Codex技能目录。例如，尚未安装同名技能时：
+将本仓库放在你的Codex技能目录。例如，尚未安装同名技能时，可用官方文档中的用户技能目录：
 
 ```sh
 git clone https://github.com/Olandooooes/offerpath-job-agent.git \
-  "$HOME/.codex/skills/offerpath-job-agent"
+  "$HOME/.agents/skills/offerpath-job-agent"
 ```
 
-保留已有同名技能和本地修改，不直接覆盖。让Codex重新发现技能后，使用`$offerpath-job-agent`调用。
+本机已有的`~/.codex/skills/`兼容安装可保留，避免同一技能重复安装。保留同名技能和本地修改，不直接覆盖。让Codex重新发现技能后，使用`$offerpath-job-agent`调用；需要新对话工具时，再完成[本地MCP连接](references/codex.md)。
 
 ### 3. 建立自己的私有工作区
 
@@ -244,8 +242,9 @@ python3 scripts/agent.py --config /你的私有工作区/agent.local.json \
 offerpath-job-agent/
 ├── SKILL.md                 Agent的流程入口
 ├── scripts/agent.py         原有Codex检查、执行状态与OfferPath同步
-├── scripts/qwenwork.py      本地MCP桥、PDF审阅与合成记录
-├── requirements-qwenwork.txt  PDF依赖（无需模型API）
+├── scripts/codex_bridge.py  Codex stdio MCP入口与配置生成
+├── scripts/qwenwork.py      复用的本地材料、PDF审阅与记录服务
+├── requirements-connector.txt  PDF依赖（无需模型API）
 ├── tests/test_agent.py      合成测试与本机HTTP集成测试
 ├── references/              申请包契约与命令说明
 ├── examples/                无个人数据的配置起点
@@ -263,7 +262,8 @@ offerpath-job-agent/
 - [x] 仓库外私有工作区初始化与本地配置检查
 - [x] 离线合成流程演示
 - [ ] 更友好的申请包编辑体验
-- [ ] 千问办公客户端实机验收及可信的对话内PDF审阅
+- [ ] Codex客户端安装、工具发现与PDF确认回流实机验收
+- [ ] 其他AI客户端适配（千问办公暂缓）
 - [ ] 面向普通用户的OfferPath独立授权连接
 - [ ] Windows/Linux正式账户凭据适配
 - [ ] 对内容定制质量的辅助评估与更多行为测试

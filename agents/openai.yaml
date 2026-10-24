@@ -1,4 +1,4 @@
 interface:
   display_name: "OfferPath Job Agent"
-  short_description: "按个人配置逐岗定制与验收申请材料，并核验OfferPath记录和实际附件同步"
-  default_prompt: "使用 $offerpath-job-agent 按我的个人配置准备岗位专用申请包，通过定制与验收检查后，在本批授权范围内投递并同步OfferPath。"
+  short_description: "在Codex中逐岗定制简历、确认PDF，并同步OfferPath记录与实际附件"
+  default_prompt: "使用 $offerpath-job-agent 先用合成资料在Codex中准备岗位专用简历，展示实际PDF供我确认，再按我明确说明的申请结果同步OfferPath记录。"
