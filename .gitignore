@@ -4,6 +4,10 @@ __pycache__/
 .env
 .env.*
 *.local.json
+secrets.json
+profile.json
+jobs.json
+*qwenwork-connection*.json
 *.sqlite*
 *.db
 runtime/

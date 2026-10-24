@@ -7,7 +7,7 @@
 ### Tailor every application. Track every step.
 
 An open-source Agent Skill for a more thoughtful job search.<br/>
-Read the role, tailor your resume, verify the outcome, and keep your records together.
+Use your own AI to tailor each resume, review the actual PDF, and keep application records connected to OfferPath.
 
 [🌐 Open OfferPath](https://offerpath.xingo.fun) · [🚀 Get started](#-get-started)
 
@@ -16,6 +16,25 @@ Read the role, tailor your resume, verify the outcome, and keep your records tog
 **One resume per role · Checks before submission · Actual receipts · Traceable records**
 
 </div>
+
+## 🆕 QwenWork connector preview
+
+Install the skill in QwenWork and connect a local OfferPath MCP bridge. In chat, the client can propose facts extracted from your supplied resume, save full job descriptions, tailor drafts, retrieve actual PDFs, and report and sync outcomes. A person confirms the profile and each PDF in the local review page. The default demo uses synthetic materials. **No model API purchase is required. The AI client supplies inference under its own quotas and terms. Synthetic input does not imply that the real QwenWork client makes no model calls.**
+
+This is a local synthetic preview alongside the existing Codex workflow. It does not deploy a public MCP endpoint, change the live OfferPath website, or submit applications.
+
+| Capability | Current boundary |
+| --- | --- |
+| Open-source skill and local bridge | Python and PDF dependencies are required on the user's machine |
+| QwenWork skill and MCP configuration | Adapted to the official format; actual client installation still requires acceptance testing |
+| Resume and job intake | The AI proposes facts for human confirmation and saves full job descriptions; the local private cache is not a deployed cloud fact store |
+| Role-specific drafts and PDFs | The client generates content; the bridge checks references and versions and creates the file. References alone do not prove a claim is true |
+| PDF approval | The person opens a local review page. The AI has no approval tool and must not click for them |
+| Synthetic record sync | Writes only a private local simulated ledger with the actual PDF; no production account writes |
+| Real OfferPath connection | Requires the account owner's available independent authorization; installing the skill does not create a public OAuth connection |
+| Existing Codex executor | Preserved with its private configuration, checks, and Keychain authentication |
+
+[QwenWork setup and protocol guide (Chinese) →](references/qwenwork.md)
 
 ## 🌱 Why this project exists
 
@@ -54,9 +73,9 @@ If an application succeeds but syncing is interrupted, recover the record and at
 | Confirm | Distinguish confirmed, unknown, and pending outcomes using actual receipts |
 | Sync | Update OfferPath, download and verify the actual attachment, then review its preview |
 
-**Developer preview:** Search, resume production, and browser interactions are performed by the Agent running the skill and its available tools. The included Python program handles validation, persistent state, and OfferPath synchronization. There is no one-click application bot, email sender, or scheduled follow-up service.
+**Developer preview:** The AI client and its available tools perform search and content tailoring. The local bridge checks references and versions, creates PDFs, and manages simulated records. The original Python executor validates real application packages, preserves execution state, and synchronizes with OfferPath. There is no one-click application bot, email sender, or scheduled follow-up service.
 
-The current `check`, `reserve`, and `sync` commands require an accessible OfferPath account. You can read the skill, prepare materials, and run synthetic tests offline; there is no alternate local ledger adapter for these commands.
+The original `agent.py` commands `check`, `reserve`, and `sync` require an accessible OfferPath account. The new connector has a separate local synthetic ledger; it is not the official status source and cannot authorize the original submission workflow.
 
 ## 🧭 The application workflow
 
@@ -86,17 +105,38 @@ Clicking Submit or seeing an increased record count does not establish completio
 
 ## 🚀 Get started
 
+### QwenWork: try the local synthetic workflow
+
+In the mainland-China QwenWork desktop app, ask:
+
+```text
+Download https://github.com/Olandooooes/offerpath-job-agent into
+~/.qwenworkcn/skills/offerpath-job-agent, preserving existing files.
+Read references/qwenwork.md. Help me initialize a new private synthetic
+workspace outside the repository, start the local bridge, and add its
+MCP configuration. Do not connect a real account or submit applications.
+```
+
+Follow the [full guide](references/qwenwork.md) for dependencies and startup. Import the generated private configuration under Extensions → Connectors → Add → Paste JSON, then start a new conversation task.
+
+Ask the skill to select a synthetic role, tailor a resume from confirmed facts, and show the actual PDF. You can supply a resume and job description to the AI client. Its tools save a proposed profile for human confirmation and the full job description; these are private local data, not a deployed cloud fact store. You do not need to shuttle result JSON between apps. A person must still open the local review page to confirm the facts and approve the PDF. Installing the skill does not start the bridge or provide a public one-click OfferPath authorization service.
+
+### Codex: existing installation
+
 ### 1. Run the synthetic tests
 
-The executor uses only the Python standard library. CI runs on Python 3.9 and 3.12.
+The original `agent.py` executor uses only the Python standard library. The QwenWork bridge additionally needs PDF dependencies. Install these before running the full suite:
 
 ```sh
 git clone https://github.com/Olandooooes/offerpath-job-agent.git
 cd offerpath-job-agent
+python3 -m pip install -r requirements-qwenwork.txt
 PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -v
 ```
 
 Tests use temporary files, synthetic materials, fake accounts, and a temporary loopback HTTP server. They do not need real credentials, send applications, or write production records. The HTTP integration test needs an environment that permits loopback listening.
+
+The full suite also needs a CJK TrueType font. Linux CI installs `fonts-wqy-zenhei` and `poppler-utils`; see the [setup guide](references/qwenwork.md). Local synthetic tests, actual PDF rendering, and an independent skill walkthrough passed; see the [acceptance scope](docs/qwenwork-acceptance.md). QwenWork desktop and production account integration are still unverified.
 
 ### 2. Install as a Codex skill
 
@@ -139,7 +179,7 @@ your-private-workspace/
 
 In your workspace's `AGENTS.md`, identify the private JSON configuration to use. Set your own locations, compensation preferences, verified facts, base resume, and authorization boundaries.
 
-**Real-account authentication currently supports macOS Keychain only.** Obtain an available independent automation authorization through your own OfferPath account and store it using system Keychain tools. Configuration references entry names, never plaintext tokens. Availability depends on your account; connection failure does not automatically create or expand permissions.
+**The original Codex executor supports macOS Keychain authentication only.** Obtain an available independent automation authorization through your own OfferPath account and store it using system Keychain tools. Configuration references entry names, never plaintext tokens. Availability depends on your account; connection failure does not automatically create or expand permissions.
 
 ### 4. Start with preparation only
 
@@ -193,14 +233,16 @@ python3 scripts/agent.py --config /path/to/private-workspace/agent.local.json \
   check --package /path/to/private-workspace/batches/package.json
 ```
 
-The 30 automated tests cover renamed generic resumes, PDF reuse across batches, authorization limits, legacy sending locks, live deduplication, unknown outcomes, invalid receipts, saved attachment snapshots, interrupted sync recovery, foreign-attachment protection, and preservation of interview stages and notes. Synthetic PDFs and images are not evidence of real visual review.
+The original automated tests cover renamed generic resumes, PDF reuse across batches, authorization limits, legacy sending locks, live deduplication, unknown outcomes, invalid receipts, saved attachment snapshots, interrupted sync recovery, foreign-attachment protection, and preservation of interview stages and notes. Synthetic PDFs and images are not evidence of real visual review.
 
 ## 🧩 Project structure
 
 ```text
 offerpath-job-agent/
 ├── SKILL.md                 Agent workflow instructions
-├── scripts/agent.py         Validation, persistent state, OfferPath sync
+├── scripts/agent.py         Existing Codex validation, state, OfferPath sync
+├── scripts/qwenwork.py      Local MCP bridge, PDF review, synthetic ledger
+├── requirements-qwenwork.txt  PDF dependencies; no model API SDK
 ├── tests/test_agent.py      Synthetic and loopback HTTP integration tests
 ├── references/              Package contract and operational guidance
 ├── examples/                Templates without personal data
@@ -218,7 +260,9 @@ offerpath-job-agent/
 - [x] Private workspace initialization and local configuration checks
 - [x] Offline synthetic workflow demo
 - [ ] Friendlier application-package editing
-- [ ] Windows and Linux credential adapters
+- [ ] Actual QwenWork client acceptance and trusted in-chat PDF review
+- [ ] Independent OfferPath authorization for ordinary users
+- [ ] Windows and Linux production credential adapters
 - [ ] Better assistance for assessing tailoring quality and more behavioral tests
 - [ ] Improved concurrency handling within available API capabilities
 - [ ] Explicit support for more recruiting channels and receipt collection

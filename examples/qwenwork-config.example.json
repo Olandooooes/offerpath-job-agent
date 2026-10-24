@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "offerpath-local": {
+      "type": "streamable-http",
+      "url": "http://127.0.0.1:4327/mcp",
+      "headers": {
+        "Authorization": "Bearer REPLACE_WITH_LOCAL_BRIDGE_TOKEN"
+      }
+    }
+  }
+}
