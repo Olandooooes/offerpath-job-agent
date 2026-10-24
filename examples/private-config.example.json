@@ -1,0 +1,17 @@
+{
+  "policy_path": "/absolute/path/to/private-workspace/policy.md",
+  "profile_path": "/absolute/path/to/private-workspace/profile.md",
+  "workbench_path": "/absolute/path/to/private-workspace/workbench.md",
+  "facts_path": "/absolute/path/to/private-workspace/facts.md",
+  "batch_root": "/absolute/path/to/private-workspace/batches",
+  "state_db": "/absolute/path/to/private-workspace/runtime/executions.sqlite3",
+  "resume_pages": 1,
+  "legacy_lock_databases": [],
+  "offerpath": {
+    "base_url": "https://offerpath.xingo.fun",
+    "keychain": {
+      "service": "your-existing-offerpath-service",
+      "account": "your-existing-offerpath-account"
+    }
+  }
+}

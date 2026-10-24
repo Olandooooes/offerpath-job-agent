@@ -1,0 +1,4 @@
+interface:
+  display_name: "OfferPath Job Agent"
+  short_description: "按个人配置逐岗定制与验收申请材料，并核验OfferPath记录和实际附件同步"
+  default_prompt: "使用 $offerpath-job-agent 按我的个人配置准备岗位专用申请包，通过定制与验收检查后，在本批授权范围内投递并同步OfferPath。"
