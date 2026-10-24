@@ -2,6 +2,8 @@
 
 # 🤖 OfferPath Job Agent
 
+**简体中文 · [English](README.en.md)**
+
 ### 让每一次申请，都有准备、有证据、有下文。
 
 一个陪你认真找工作的开源 Agent Skill。<br/>
