@@ -111,6 +111,16 @@ Preserve existing installations and local changes. Once Codex discovers the skil
 
 ### 3. Create your private workspace
 
+Use a **new directory outside the repository**. Omit `--workspace` to be prompted. Existing directories are never overwritten.
+
+```sh
+python3 scripts/setup.py init --workspace /path/to/new-private-workspace
+python3 scripts/setup.py check --config /path/to/new-private-workspace/agent.local.json
+```
+
+The wizard creates private templates without networking or Keychain access. Local checks flag missing paths, paths inside the repository, and unchanged Keychain references. They do not verify credentials or personal facts. Complete your profile and existing Keychain references, then run `agent.py doctor` when ready. Setup does not authorize applications.
+
+
 Start with the [configuration example](examples/private-config.example.json), [profile template](examples/profile.example.md), and [policy template](examples/policy.example.md). The templates, skill instructions, and technical reference documents are currently in Chinese; this English README provides the project overview and setup guide.
 
 Keep your completed personal files outside the repository and configure real absolute paths:
@@ -151,6 +161,18 @@ the actual attachments to OfferPath, review cloud previews, and report gaps.
 
 Invoking the skill alone does not authorize sending. Batch authorization does not skip tailoring, review, or receipt verification.
 
+## 🎭 Offline synthetic demo
+
+No account required:
+
+```sh
+python3 scripts/demo.py --output /path/to/new-demo-directory
+```
+
+Open the generated `index.html` to see a fictional job description, before/after resume text, state transitions, and a simulated OfferPath record. `report.json` contains machine-readable results; synthetic PDFs and evidence files are also saved. The output must be a new directory outside the repository.
+
+**No network calls, credential access, real applications, or real cloud writes.** Receipts and visual-review assertions are explicitly simulated. They are not real application evidence. This demonstrates validation and synchronization state; it does not generate resumes for real jobs or replace actual PDF rendering and review.
+
 ## 🛠 Development and testing
 
 Entry point: `scripts/agent.py`. See the [application package contract](references/package.md) and [operations guide](references/operations.md) for complete fields and procedures (currently Chinese).
@@ -171,7 +193,7 @@ python3 scripts/agent.py --config /path/to/private-workspace/agent.local.json \
   check --package /path/to/private-workspace/batches/package.json
 ```
 
-The 25 automated tests cover renamed generic resumes, PDF reuse across batches, authorization limits, legacy sending locks, live deduplication, unknown outcomes, invalid receipts, saved attachment snapshots, interrupted sync recovery, foreign-attachment protection, and preservation of interview stages and notes. Synthetic PDFs and images are not evidence of real visual review.
+The 30 automated tests cover renamed generic resumes, PDF reuse across batches, authorization limits, legacy sending locks, live deduplication, unknown outcomes, invalid receipts, saved attachment snapshots, interrupted sync recovery, foreign-attachment protection, and preservation of interview stages and notes. Synthetic PDFs and images are not evidence of real visual review.
 
 ## 🧩 Project structure
 
@@ -193,7 +215,9 @@ offerpath-job-agent/
 - [x] OfferPath record synchronization and attachment download verification
 - [x] Separate cloud preview confirmation
 - [x] Synthetic HTTP integration tests
-- [ ] Friendlier setup and application-package editing
+- [x] Private workspace initialization and local configuration checks
+- [x] Offline synthetic workflow demo
+- [ ] Friendlier application-package editing
 - [ ] Windows and Linux credential adapters
 - [ ] Better assistance for assessing tailoring quality and more behavioral tests
 - [ ] Improved concurrency handling within available API capabilities

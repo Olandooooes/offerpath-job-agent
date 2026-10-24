@@ -299,7 +299,8 @@ class Agent:
             require(actual.get('applied_at') and marker in (actual.get('notes') or '') and actual.get('resume_name') == Path(job['resume']['path']).name and self.api.request(path + '/resume') == pdf, '最终回读失败')
             self.db.execute("UPDATE executions SET sync_state=CASE WHEN sync_state='complete' THEN 'complete' ELSE 'bytes_verified' END WHERE job_key=?", (job_key,))
             self.db.commit()
-            results.append({'application_id': job['application_id'], 'state': 'bytes_verified', 'sha256': sha(pdf), 'bytes': len(pdf), 'stage': actual['stage'], 'preview': 'pending'})
+            sync_state = self.db.execute('SELECT sync_state FROM executions WHERE job_key=?', (job_key,)).fetchone()[0]
+            results.append({'application_id': job['application_id'], 'state': sync_state, 'sha256': sha(pdf), 'bytes': len(pdf), 'stage': actual['stage'], 'preview': 'complete' if sync_state == 'complete' else 'pending', 'next_action': self.next_action(state, sync_state)})
         return results
 
     def preview(self, batch_id, job_key, evidence):
@@ -314,7 +315,15 @@ class Agent:
         self.db.commit()
 
     def status(self, batch_id):
-        return [dict(job_key=r[0], outcome=r[1], sync=r[2], application_id=json.loads(r[3])['application_id']) for r in self.db.execute('SELECT job_key,state,sync_state,job FROM executions WHERE batch_id=?', (batch_id,))]
+        return [dict(job_key=r[0], outcome=r[1], sync=r[2], application_id=json.loads(r[3])['application_id'], next_action=self.next_action(r[1], r[2])) for r in self.db.execute('SELECT job_key,state,sync_state,job FROM executions WHERE batch_id=?', (batch_id,))]
+
+    @staticmethod
+    def next_action(outcome, sync_state):
+        if outcome != 'confirmed':
+            return '查证同一次申请的真实回执；保留锁，不重新投递'
+        return {'pending': '申请已确认；预演并补同步，不重新投递',
+                'bytes_verified': '附件已核验；检查实际云端预览后运行preview',
+                'complete': '流程已完成；等待实际反馈，无需重复预览或投递'}.get(sync_state, '状态异常，需人工核查')
 
 
 def main():

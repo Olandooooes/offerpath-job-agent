@@ -207,8 +207,21 @@ class AgentTests(unittest.TestCase):
 
     def test_resync_keeps_completed_preview(self):
         self.test_dry_run_and_snapshot_then_preview_complete()
-        self.agent.sync('test-batch', True)
+        result = self.agent.sync('test-batch', True)[0]
+        self.assertEqual(result['state'], 'complete')
+        self.assertEqual(result['preview'], 'complete')
+        self.assertEqual(result['next_action'], self.agent.status('test-batch')[0]['next_action'])
         self.assertEqual(self.agent.status('test-batch')[0]['sync'], 'complete')
+
+    def test_status_distinguishes_unknown_sync_and_preview(self):
+        self.agent.reserve(self.package)
+        self.assertIn('不重新投递', self.agent.status('test-batch')[0]['next_action'])
+        self.agent.confirm('test-batch', m.key(self.job), 'confirmed', self.receipt())
+        self.assertIn('补同步', self.agent.status('test-batch')[0]['next_action'])
+        result = self.agent.sync('test-batch', True)[0]
+        self.assertEqual(result['preview'], 'pending')
+        self.assertEqual(result['state'], 'bytes_verified')
+        self.assertIn('preview', result['next_action'])
 
     def test_expired_permit_not_accepted_as_compliant(self):
         self.agent.reserve(self.package)

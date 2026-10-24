@@ -111,6 +111,17 @@ git clone https://github.com/Olandooooes/offerpath-job-agent.git \
 
 ### 3. 建立自己的私有工作区
 
+运行配置向导，指定**仓库外尚不存在的新目录**；省略路径会询问目录。向导只创建私有模板，不读取钥匙串、不联网、不授予投递权限。
+
+```sh
+python3 scripts/setup.py init --workspace /path/to/new-private-workspace
+python3 scripts/setup.py check --config /path/to/new-private-workspace/agent.local.json
+```
+
+本地检查会指出路径缺失、仓库内路径和未修改的钥匙串引用；它不会核验事实内容或凭据。默认模板尚不能用于真实投递，先填写资料和本人既有钥匙串引用，再运行 `agent.py doctor`。已存在的目录不会被覆盖。
+
+也可以手动配置：
+
 从[配置样例](examples/private-config.example.json)、[个人资料样例](examples/profile.example.md)和[执行规范样例](examples/policy.example.md)开始。将修改后的个人文件放到仓库外，再配置真实绝对路径。
 
 ```text
@@ -147,6 +158,18 @@ $offerpath-job-agent
 
 调用技能不自动授权发送；批量授权也不省略定制、核验和回执检查。
 
+## 🎭 离线合成演示
+
+无需账户即可试跑完整状态流程：
+
+```sh
+python3 scripts/demo.py --output /path/to/new-demo-directory
+```
+
+打开生成的 `index.html` 查看虚构JD、定制前后文字、状态变化和模拟OfferPath记录；`report.json` 为机器可读结果，另有合成PDF与证据文件。输出目录必须在仓库外且尚不存在。
+
+**演示不联网、不读凭据、不投递、不写真实云端。**回执和视觉验收均为明确标注的模拟数据，不能作为真实投递证据。它演示检查与同步状态机，不会自动生成真实岗位的简历，也不替代实际PDF渲染验收。
+
 ## 🛠 开发与测试
 
 命令入口：`scripts/agent.py`。完整字段与操作见[申请包契约](references/package.md)和[操作说明](references/operations.md)。
@@ -167,7 +190,7 @@ python3 scripts/agent.py --config /你的私有工作区/agent.local.json \
   check --package /你的私有工作区/batches/package.json
 ```
 
-当前25项自动测试覆盖通用母版改名、跨批复用同PDF、授权数量超限、旧发送锁、实时去重、结果未知恢复、错误回执、附件快照、同步中断恢复、不同附件保护以及面试状态保留等。测试中的合成图片与PDF不代表真实材料的视觉验收。
+当前30项自动测试覆盖通用母版改名、跨批复用同PDF、授权数量超限、旧发送锁、实时去重、结果未知恢复、错误回执、附件快照、同步中断恢复、不同附件保护以及面试状态保留等。测试中的合成图片与PDF不代表真实材料的视觉验收。
 
 ## 🧩 项目结构
 
@@ -189,7 +212,9 @@ offerpath-job-agent/
 - [x] OfferPath记录与实际PDF同步回读
 - [x] 云端预览独立确认
 - [x] 合成HTTP集成测试
-- [ ] 更友好的初始化向导和申请包编辑体验
+- [x] 仓库外私有工作区初始化与本地配置检查
+- [x] 离线合成流程演示
+- [ ] 更友好的申请包编辑体验
 - [ ] Windows/Linux凭据适配
 - [ ] 对内容定制质量的辅助评估与更多行为测试
 - [ ] 基于当前接口能力改进并发冲突处理
